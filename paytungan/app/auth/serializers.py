@@ -16,7 +16,7 @@ class UserSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=False, default=None, allow_null=True, allow_blank=True
     )
-    email = serializers.CharField(
+    email = serializers.EmailField(
         required=False, default=None, allow_null=True, allow_blank=True
     )
     name = serializers.CharField(
@@ -38,7 +38,7 @@ class CreateUserRequest(serializers.Serializer):
     username = serializers.CharField(
         required=False, default=None, allow_null=True, allow_blank=True
     )
-    email = serializers.CharField(
+    email = serializers.EmailField(
         required=False, default=None, allow_null=True, allow_blank=True
     )
     name = serializers.CharField(
@@ -65,7 +65,7 @@ class LoginResponse(serializers.Serializer):
 class UpdateUserRequest(serializers.Serializer):
     username = serializers.CharField()
     name = serializers.CharField()
-    email = serializers.CharField()
+    email = serializers.EmailField()
     profil_image = serializers.CharField(
         required=False, default=None, allow_null=True, allow_blank=True
     )

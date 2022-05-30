@@ -18,6 +18,7 @@ from paytungan.app.split_bill.specs import (
     GetSplitBillCurrentUserSpec,
     GetSplitBillListSpec,
     GroupSplitBillDomain,
+    UserIdWithAmountBillDomain,
 )
 
 
@@ -42,7 +43,8 @@ class TestSplitBillService(TestCase):
             id=fake.pyint(),
             user_id=user_id or fake.pyint(),
             split_bill_id=split_bill_id or fake.pyint(),
-            amount=fake.pyint(min_value=5000, max_value=10000),
+            amount=fake.pyint(min_value=10000, max_value=100000),
+            admin_fee=fake.pyint(min_value=100, max_value=100000),
             status=fake.pystr(),
             details=fake.pystr_format(),
             created_at=time_now,
@@ -63,7 +65,7 @@ class TestSplitBillService(TestCase):
 
     def test_bill_service_create(self):
         self.bill_service.create_bill(
-            CreateBillSpec(user_id=1, split_bill_id=1, amount=123)
+            CreateBillSpec(user_id=1, split_bill_id=1, amount=10000, admin_fee=100)
         )
         assert True
 
@@ -95,19 +97,17 @@ class TestSplitBillService(TestCase):
             withdrawal_number="asasa",
             amount=2460,
             bills=[
-                OrderedDict(
-                    [
-                        ("user_id", 1),
-                        ("amount", 2460),
-                        ("details", "Beli nasi goreng si dandang"),
-                    ]
+                UserIdWithAmountBillDomain(
+                    user_id=1,
+                    amount=10000,
+                    admin_fee=100,
+                    details="Beli nasi goreng si dandang",
                 ),
-                OrderedDict(
-                    [
-                        ("user_id", 2),
-                        ("amount", 2460),
-                        ("details", "Beli nasi goreng si dandang"),
-                    ]
+                UserIdWithAmountBillDomain(
+                    user_id=1,
+                    amount=10000,
+                    admin_fee=100,
+                    details="Beli nasi goreng si dandang",
                 ),
             ],
         )

@@ -39,4 +39,4 @@ class Payment(BaseModel):
 
     @property
     def amount(self) -> int:
-        return self.bill.amount
+        return self.bill.amount + self.bill.admin_fee

@@ -47,6 +47,7 @@ class Bill(BaseModel):
     )
     status = models.CharField(max_length=16, default=BillStatus.PENDING.value)
     amount = models.PositiveIntegerField()
+    admin_fee = models.PositiveIntegerField(default=0)
     details = models.TextField(null=True, blank=True)
 
     class Meta:

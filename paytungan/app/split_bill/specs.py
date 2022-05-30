@@ -24,6 +24,7 @@ class BillDomain(BaseDomain):
     user_id: int
     split_bill_id: int
     amount: int
+    admin_fee: int
     status: str = BillStatus.PENDING.value
     user: Optional[User] = None
     details: Optional[str] = None
@@ -52,6 +53,7 @@ class CreateBillSpec:
     user_id: int
     split_bill_id: int
     amount: int
+    admin_fee: int
     details: Optional[str] = None
 
 
@@ -83,6 +85,8 @@ class CreateSplitBillSpec:
 class UserIdWithAmountBillDomain:
     user_id: int
     amount: int
+    admin_fee: int
+    details: Optional[str] = None
 
 
 @dataclass

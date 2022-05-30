@@ -29,7 +29,8 @@ class BillSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(min_value=1)
     split_bill_id = serializers.IntegerField(min_value=1)
     status = serializers.ChoiceField(choices=EnumUtil.extract_enum_values(BillStatus))
-    amount = serializers.IntegerField(min_value=0)
+    amount = serializers.IntegerField(min_value=10000)
+    admin_fee = serializers.IntegerField(min_value=0, required=False, default=0)
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
     user = UserProfileSerializer(required=False, allow_null=True)
@@ -42,7 +43,8 @@ class GetBillResponse(serializers.Serializer):
 
 class CreateBillRequest(serializers.Serializer):
     split_bill_id = serializers.IntegerField(min_value=1)
-    amount = serializers.IntegerField(min_value=0)
+    amount = serializers.IntegerField(min_value=10000)
+    admin_fee = serializers.IntegerField(min_value=1, required=False, default=0)
     details = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
 
@@ -77,6 +79,7 @@ class GetSplitBillResponse(serializers.Serializer):
 class UserIdWithAmountBillSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(min_value=1)
     amount = serializers.IntegerField(min_value=10000)
+    admin_fee = serializers.IntegerField(min_value=1, required=False, default=0)
     details = serializers.CharField(required=False, allow_null=True, default=None)
 
 

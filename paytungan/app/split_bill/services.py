@@ -64,19 +64,21 @@ class SplitBillService:
 
         bills_domain = [
             BillDomain(
-                user_id=bill["user_id"],
+                user_id=bill.user_id,
                 split_bill_id=split_bill.id,
-                amount=bill["amount"],
-                details=bill["details"],
+                amount=bill.amount,
+                admin_fee=bill.admin_fee,
+                details=bill.details,
                 **ObjectMapperUtil.default_domain_creation_params()
             )
-            if bill["user_id"] != spec.user_fund_id
+            if bill.user_id != spec.user_fund_id
             else BillDomain(
                 user_id=spec.user_fund_id,
                 split_bill_id=split_bill.id,
-                amount=bill["amount"],
+                amount=bill.amount,
+                admin_fee=bill.admin_fee,
                 status=BillStatus.PAID.value,
-                details=bill["details"],
+                details=bill.details,
                 **ObjectMapperUtil.default_domain_creation_params()
             )
             for bill in spec.bills

@@ -231,19 +231,23 @@ class PaymentService:
         bills = self.bill_accessor.get_list(
             GetBillListSpec(split_bill_ids=[split_bill.id])
         )
-        amount_paid = sum(
-            [
-                bill.amount
-                for bill in bills
-                if bill.status == BillStatus.PAID.value
+
+        bill_user_fund = None
+        amount_paid = 0
+        for bill in bills:
+            if (
+                bill.status == BillStatus.PAID.value
                 and bill.user_id != split_bill.user_fund_id
-            ]
-        )
+            ):
+                amount_paid += bill.amount
+
+            if bill.user_id == split_bill.user_fund_id:
+                bill_user_fund = bill
 
         payout = self.xendit_provider.create_payout(
             CreateXenditPayoutSpec(
                 external_id=str(split_bill.id),
-                amount=amount_paid,
+                amount=amount_paid - bill_user_fund.admin_fee,
                 email=split_bill.user_fund_email,
             )
         )

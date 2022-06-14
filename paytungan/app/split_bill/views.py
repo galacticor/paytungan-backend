@@ -153,16 +153,7 @@ class SplitBillViewSet(viewsets.ViewSet):
     def create_split_bill(self, request: Request, user: UserDomain) -> Response:
         serializer = CreateSplitBillRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.data
-        spec = CreateGroupSplitBillSpec(
-            name=data["name"],
-            user_fund_id=data["user_fund_id"],
-            withdrawal_method=data["withdrawal_method"],
-            withdrawal_number=data["withdrawal_number"],
-            amount=data["amount"],
-            details=data["details"],
-            bills=data["bills"],
-        )
+        spec = ObjectMapperUtil.map(serializer.data, CreateGroupSplitBillSpec)
         split_bill = split_bill_service.create_group_split_bill(spec)
         return Response(CreateSplitBillResponse({"data": split_bill}).data)
 

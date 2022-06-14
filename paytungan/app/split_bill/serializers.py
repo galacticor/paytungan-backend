@@ -97,8 +97,8 @@ class CreateSplitBillRequest(serializers.Serializer):
         allow_null=True,
         allow_blank=True,
     )
-    details = serializers.CharField(required=False, allow_null=True)
     amount = serializers.IntegerField(min_value=10000)
+    details = serializers.CharField(required=False, allow_null=True)
     bills = UserIdWithAmountBillSerializer(many=True)
 
 

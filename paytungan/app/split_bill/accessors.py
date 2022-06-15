@@ -16,7 +16,6 @@ from .specs import (
     UpdateBillSpec,
     UpdateSplitBillSpec,
 )
-from paytungan.app.base.constants import DEFAULT_LOGGER
 
 
 class BillAccessor(IBillAccessor):
@@ -72,6 +71,7 @@ class BillAccessor(IBillAccessor):
             user_id=obj.user_id,
             split_bill_id=obj.split_bill_id,
             amount=obj.amount,
+            admin_fee=obj.admin_fee,
             status=obj.status,
             details=obj.details,
             **ObjectMapperUtil.default_model_creation_params()

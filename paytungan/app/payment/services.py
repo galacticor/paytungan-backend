@@ -239,7 +239,7 @@ class PaymentService:
                 bill.status == BillStatus.PAID.value
                 and bill.user_id != split_bill.user_fund_id
             ):
-                amount_paid += bill.amount
+                amount_paid += bill.amount - bill.admin_fee
 
             if bill.user_id == split_bill.user_fund_id:
                 bill_user_fund = bill

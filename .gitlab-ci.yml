@@ -11,6 +11,9 @@ linter:
   script:
     - black . --check
 
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+
 test:
   image: python:3.8
   stage: test
@@ -27,6 +30,8 @@ test:
     - coverage run --include='paytungan/app/*/services*' manage.py test
     - coverage xml -o tests/coverage.xml
     - coverage report -m
+  variables:
+    CI_DEBUG_TRACE: "true"
   artifacts:
     untracked: true
     when: always

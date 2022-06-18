@@ -1,96 +1,98 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
-  - test
-  - sonarqube
-  - deploy-dev
-  - deploy-prod
-
+- test
+- sonarqube
+- deploy-dev
+- deploy-prod
 linter:
   image: registry.gitlab.com/pipeline-components/black:latest
   stage: test
   when: on_success
   script:
-    - black . --check
-
+  - black . --check
 include:
-  - template: Dependency-Scanning.gitlab-ci.yml
-
+- template: Dependency-Scanning.gitlab-ci.yml
+- template: Security/SAST.gitlab-ci.yml
 test:
   image: python:3.8
   stage: test
   before_script:
-    - pip install -r requirements.txt
-    - pip install -r requirements-dev.txt
-    - export DJANGO_SETTINGS_MODULE=paytungan.settings
-    - export APP_ENV=test
-    - export FIREBASE_PRIVATE_KEY=dummy
-    - export FIREBASE_PRIVATE_KEY_ID=dummy
-    - python manage.py migrate
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+  - export DJANGO_SETTINGS_MODULE=paytungan.settings
+  - export APP_ENV=test
+  - export FIREBASE_PRIVATE_KEY=dummy
+  - export FIREBASE_PRIVATE_KEY_ID=dummy
+  - python manage.py migrate
   when: on_success
   script:
-    - coverage run --include='paytungan/app/*/services*' manage.py test
-    - coverage xml -o tests/coverage.xml
-    - coverage report -m
+  - coverage run --include='paytungan/app/*/services*' manage.py test
+  - coverage xml -o tests/coverage.xml
+  - coverage report -m
   variables:
-    CI_DEBUG_TRACE: "true"
+    CI_DEBUG_TRACE: 'true'
   artifacts:
     untracked: true
     when: always
     paths:
-      - tests/coverage.xml
-
+    - tests/coverage.xml
 deploy-dev:
   image: ruby:2.7.1
   stage: deploy-dev
   before_script:
-    - gem install dpl
-    - wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
+  - gem install dpl
+  - wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
   script:
-    - dpl --provider=heroku --app=$HEROKU_APPNAME --api-key=$HEROKU_APIKEY
-    - export HEROKU_API_KEY=$HEROKU_APIKEY
+  - dpl --provider=heroku --app=$HEROKU_APPNAME --api-key=$HEROKU_APIKEY
+  - export HEROKU_API_KEY=$HEROKU_APIKEY
   environment:
     name: production
-    url: $HEROKU_APP_HOST
+    url: "$HEROKU_APP_HOST"
   only:
-    - main
-
+  - main
 sonar-scanner:
   image:
     name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
+    entrypoint:
+    - ''
   stage: sonarqube
   dependencies:
-    - test
+  - test
   script:
-    - cat tests/coverage.xml
-    - sonar-scanner
-      -Dsonar.host.url=https://pmpl.cs.ui.ac.id/sonarqube
-      -Dsonar.branch.name=$CI_COMMIT_REF_NAME
-      -Dsonar.login=$SONARQUBE_TOKEN
+  - cat tests/coverage.xml
+  - sonar-scanner -Dsonar.host.url=https://pmpl.cs.ui.ac.id/sonarqube -Dsonar.branch.name=$CI_COMMIT_REF_NAME
+    -Dsonar.login=$SONARQUBE_TOKEN
   allow_failure: true
   except:
-    - main
-    - prod
-
+  - main
+  - prod
 deploy:
   stage: deploy-prod
   image: google/cloud-sdk
   services:
-    - docker:dind
+  - docker:dind
   script:
-    - echo $GCP_SERVICE_KEY > gcloud-service-key.json # Google Cloud service accounts
-    - gcloud auth activate-service-account --key-file gcloud-service-key.json
-    - gcloud config set project $GCP_PROJECT_ID
-    - gcloud builds submit . --config=cloudbuild.yaml --substitutions=_DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE,_DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY,_DB_CONFIG=$DB_CONFIG,_APP_ENV="prod"
+  - echo $GCP_SERVICE_KEY > gcloud-service-key.json
+  - gcloud auth activate-service-account --key-file gcloud-service-key.json
+  - gcloud config set project $GCP_PROJECT_ID
+  - gcloud builds submit . --config=cloudbuild.yaml --substitutions=_DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE,_DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY,_DB_CONFIG=$DB_CONFIG,_APP_ENV="prod"
   only:
-    - prod
-
+  - prod
 migrate-prod:
   image: python:3.8
   stage: deploy-prod
   before_script:
-    - pip install -r requirements.txt
+  - pip install -r requirements.txt
   when: on_success
   script:
-    - python manage.py migrate
+  - python manage.py migrate
   only:
-    - prod
+  - prod
+sast:
+  stage: test

@@ -41,25 +41,25 @@ class TestAuthService(TestCase):
 
     def test_user_service_get(self):
         self.user_service.get(1)
-        assert True
+        self.assertTrue(self.mock.get.called)
 
     def test_user_service_get_by_username(self):
         self.user_service.get_by_username("string")
-        assert True
+        self.assertTrue(self.mock.get_by_username.called)
 
     def test_user_service_get_by_firebase_uid(self):
         self.user_service.get_by_firebase_uid("asasas")
-        assert True
+        self.assertTrue(self.mock.get_by_firebase_uid.called)
 
     def test_user_service_get_list(self):
         spec = GetUserListSpec(user_ids=[1], usernames=[])
         self.user_service.get_list(spec)
-        assert True
+        self.assertTrue(self.mock.get_list.called)
 
     def test_user_service_register(self):
         spec = CreateUserSpec(firebase_uid="aa", phone_number="aaa")
         self.user_service.create_user(spec)
-        assert True
+        self.assertTrue(self.mock.create.called)
 
     def test_user_service_update_user(self):
         spec = UpdateUserSpec(
@@ -70,7 +70,7 @@ class TestAuthService(TestCase):
             profil_image="aaaaa",
         )
         self.user_service.update_user(spec)
-        assert True
+        self.assertTrue(self.mock.update.called)
 
     def test_auth_login_succeed(self):
         token = "token"
@@ -103,7 +103,7 @@ class TestAuthService(TestCase):
 
     def test_auth_service_get_user_from_token(self):
         self.auth_service.get_user_from_token("aaa")
-        assert True
+        self.assertTrue(True)
 
     def test_auth_service_decode_token(self):
         token = "token"
